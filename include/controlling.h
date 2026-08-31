@@ -280,11 +280,12 @@ inline void handleSerialCommand() {
         if (input.equalsIgnoreCase("Stop")) {
             setStopMotors();
             system_state = SS_MAIN_MENU;
-            Serial.println("OK:Stop");
+            Serial.println("ОК:Стоп");
             Serial.flush();
             continue;
         }
         if (input.equalsIgnoreCase("Start")) {
+            // handshake: оставляем "Start" — WalkBot ждёт именно это
             Serial.println("Start");
             Serial.flush();
             system_state = SS_MAIN_MENU;
@@ -295,6 +296,7 @@ inline void handleSerialCommand() {
             for (int i = 0; i < 3; i++) {
                 if (!hip.isFault() && !knee.isFault() && !foot.isFault()) ok++;
             }
+            // Yes/No — handshake с ПК
             Serial.println(ok >= 2 ? "No" : "Yes");
             Serial.flush();
             continue;
@@ -378,7 +380,8 @@ inline void mainControl() {
                                 setMotor(i, motorParams[i].speed, motorParams[i].acceleration, motorParams[i].deceleration);
                             }
                         }
-                        Serial.print("<ANGLES:");
+                        // <УГЛЫ:бедр,колен,стоп> °
+                        Serial.print("<УГЛЫ:");
                         Serial.print((int)degrees(current_q1));
                         Serial.print(",");
                         Serial.print((int)degrees(-1 * current_q21));
@@ -446,7 +449,8 @@ inline void mainControl() {
                         float mKnee = CanTpdo::velocityDegPerSec(NID_KNEE);
                         float mFoot = CanTpdo::velocityDegPerSec(NID_FOOT);
 
-                        Serial.print("<ANGLES:");
+                        // <УГЛЫ:бедр,колен,стоп> °
+                        Serial.print("<УГЛЫ:");
                         Serial.print(aHip, 2);
                         Serial.print(",");
                         Serial.print(aKnee, 2);
@@ -454,8 +458,8 @@ inline void mainControl() {
                         Serial.print(aFoot, 2);
                         Serial.println(">");
 
-                        // <VEL:cmdH,cmdK,cmdF,actH,actK,actF>  — °/с
-                        Serial.print("<VEL:");
+                        // <СКОР:задH,задK,задF,фактH,фактK,фактF>  — °/с
+                        Serial.print("<СКОР:");
                         Serial.print(vHip, 2);
                         Serial.print(",");
                         Serial.print(vKnee, 2);
@@ -469,7 +473,8 @@ inline void mainControl() {
                         Serial.print(mFoot, 2);
                         Serial.println(">");
 
-                        Serial.print("<LOAD:");
+                        // <НАГР:I_бедр,I_кол,I_стоп,M_бедр,M_кол,M_стоп>  — % номинала
+                        Serial.print("<НАГР:");
                         Serial.print(CanTpdo::currentPercent(NID_HIP), 1);
                         Serial.print(",");
                         Serial.print(CanTpdo::currentPercent(NID_KNEE), 1);
@@ -487,7 +492,7 @@ inline void mainControl() {
 
                 case 2: {
                     // if (legArrived()) {
-                        Serial.println("<END>");
+                        Serial.println("<КОНЕЦ>");
                         Serial.flush();
                         system_state = SS_MAIN_MENU;
                     // }

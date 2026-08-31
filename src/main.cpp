@@ -50,7 +50,7 @@ void loop() {
 
   if (PRINT_POSITION_ENCODER == 1) {
     CanTpdo::poll(canSerial);
-    Serial.print("pos H/K/F: ");
+    Serial.print("поз Бедр/Кол/Стоп: ");
     Serial.print(CanTpdo::position(NID_HIP)); Serial.print(" ");
     Serial.print(CanTpdo::position(NID_KNEE)); Serial.print(" ");
     Serial.print(CanTpdo::position(NID_FOOT));
